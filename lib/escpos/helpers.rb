@@ -152,6 +152,10 @@ module Escpos
       raise ArgumentError("Height must be in range from 1 to 255.") if height && (height < 1 || height > 255)
       width = opts.fetch(:width, 3)
       raise ArgumentError("Width must be in range from 2 to 6.") if width && (width < 2 || width > 6)
+      data_length = nil
+      unless opts[:data_length].nil?
+         data_length = data.length.chr
+      end
       [
         Escpos.sequence(text_position),
         Escpos.sequence(Escpos::BARCODE_WIDTH),
@@ -159,8 +163,9 @@ module Escpos
         Escpos.sequence(Escpos::BARCODE_HEIGHT),
         Escpos.sequence([height]),
         Escpos.sequence(opts.fetch(:format, Escpos::BARCODE_EAN13)),
+        data_length,
         data
-      ].join
+      ].compact.join
     end
 
     def partial_cut
